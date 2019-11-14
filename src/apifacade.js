@@ -7,20 +7,9 @@ function handleHttpErrors(res) {
 }
 
 class ApiFacade {
-    roles = [];
-
     setToken = (token) => {
         localStorage.setItem('jwtToken', token)
     }
-
-    /*
-    setRoles = (r) => {
-        this.roles = r;
-    }
-
-    getRoles = () => {
-        return this.roles;
-    } */
 
     getToken = () => {
         return localStorage.getItem('jwtToken')
@@ -36,10 +25,12 @@ class ApiFacade {
     }
 
     login = (user, pass) => {
-        const options = this.makeOptions("POST", true, { username: user, password: pass });
-        return fetch(URL + "/api/login", options)
-            .then(handleHttpErrors)
-            .then(res => this.setToken(res.token));
+        const options = this.makeOptions("POST", true, {username: user, password: pass});
+        const promise = fetch(URL + "/api/login", options) 
+            .then(handleHttpErrors);
+        
+        promise.then(res => this.setToken(res.token));
+        return promise;
     }
 
     makeOptions(method, addToken, body) {

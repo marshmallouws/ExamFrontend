@@ -3,20 +3,29 @@ import facade from "./apifacade";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [roles, setRoles] = useState();
+  const [roles, setRoles] = useState([]);
+  const [err, setErr] = useState("");
 
   const logout = () => {
     facade.logout();
     setLoggedIn(false);
   }
 
+  const setErrorMsg = (msg) => {
+    setErr(msg);
+  }
+
   const login = (user, pass) => {
-    facade.login(user, pass).then(res => setLoggedIn(true));
+    facade.login(user, pass)
+      .then(data => {setRoles(data.roles); setLoggedIn(true)})
+      .catch(err => {
+        setErrorMsg("Wrong username or password");
+      });
   }
 
   return (
     <div>
-      {!loggedIn ? (<LogIn login={login} />) :
+      {!loggedIn ? (<div><LogIn login={login} setErrorMsg={setErrorMsg} /><p>{err}</p></div>) :
         (<div>
           <LoggedIn roles={roles} />
           <button onClick={logout}>Logout</button>
@@ -35,6 +44,7 @@ function LogIn(props) {
   }
 
   const onChange = (event) => {
+    props.setErrorMsg("");
     if (event.target.id === "username") {
       setUsername(event.target.value);
     } else {
@@ -55,12 +65,16 @@ function LogIn(props) {
 }
 
 function LoggedIn(props) {
+  const {roles} = props;
   const [dataFromServer, setDataFromServer] = useState("Fetching!!");
   return (
     <div>
       <h2>Data recieved</h2>
       <h3>{dataFromServer}</h3>
-
+      <h4>Roles</h4>
+        {
+          roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
+        }
     </div>
   )
 }
