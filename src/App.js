@@ -1,8 +1,78 @@
 import React, { useState } from "react"
 import facade from "./apifacade";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  NavLink,
+  Redirect
+} from "react-router-dom";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const setLoggedIn = (state) => {
+    setIsLoggedIn(state);
+  }
+
+  return(
+    <Router>
+    <Navbar/>
+      <Switch>
+        <Route exact path="/">
+          <Home/>
+        </Route>
+        <Route path="/login">
+          <LogIn setIsLoggedIn={setIsLoggedIn}/>
+        </Route>
+        <PrivateRoute path="/test">
+          <Test/>
+        </PrivateRoute>
+      </Switch>
+    </Router>
+  );
+}
+
+function Navbar() {
+  return(
+    <nav className="header">
+      <ul>
+        <li>
+          <NavLink exact to="/">Home</NavLink>
+        </li>
+        <li>
+          <NavLink to="/login">Login</NavLink>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
+const PrivateRoute = ({component: Component, ...rest}) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => fakeAuth.isAuthenticated === true
+        ? <Component {...props} />
+        : <Redirect to={{pathname: '/login', state: {from: props.location}}} />} />
+  )
+}
+
+function Test() {
+  return(
+    <div>Private!</div>
+  )
+}
+
+function Home() {
+  return(
+    <div>Home</div>
+  );
+}
+
+/*
+function Login(props) {
+  //const [loggedIn, setLoggedIn] = useState(false);
   const [roles, setRoles] = useState([]);
   const [err, setErr] = useState("");
 
@@ -17,14 +87,14 @@ function App() {
 
   const login = (user, pass) => {
     facade.login(user, pass)
-      .then(data => {setRoles(data.roles); setLoggedIn(true)})
+      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
       .catch(err => {
         setErrorMsg("Wrong username or password");
       });
   }
 
   return (
-    <div>
+    <div> 
       {!loggedIn ? (<div><LogIn login={login} setErrorMsg={setErrorMsg} /><p>{err}</p></div>) :
         (<div>
           <LoggedIn roles={roles} />
@@ -32,19 +102,30 @@ function App() {
         </div>)}
     </div>
   )
-}
+}  */
 
 function LogIn(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [err, setErr] = useState("");
+  const [roles, setRoles] = useState([]);
+  /*
   const login = (event) => {
     event.preventDefault();
     props.login(username, password);
+  } */
+
+  const login = (event) => {
+    event.preventDefault();
+    facade.login(username, password)
+      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
+      .catch(err => {
+        setErr("Wrong username or password");
+    });
   }
 
   const onChange = (event) => {
-    props.setErrorMsg("");
+    setErr("");
     if (event.target.id === "username") {
       setUsername(event.target.value);
     } else {
@@ -69,25 +150,6 @@ function LogIn(props) {
     </div>
   )
 }
-
-/*
-form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-  </div>
-  <div class="form-group form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-*/
 
 function LoggedIn(props) {
   const {roles} = props;
