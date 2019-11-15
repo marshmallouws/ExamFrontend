@@ -13,32 +13,48 @@ function App() {
   const [roles, setRoles] = useState([]);
 
 
-  const getRoles = (r) => {
+  const logInState = (r) => {
     setRoles(r);
   }
 
-  return(
+
+
+  return (
     <Router>
-    <Navbar/>
+      <Navbar/>
       <Switch>
         <Route exact path="/">
-          <Home/>
+          <Home />
         </Route>
         <Route path="/login">
-          <Login getRoles={getRoles}/>
+          <LogIn logInState={logInState} />
         </Route>
-        <PrivateRoute path="/user" component={LoggedIn} roles={roles}/>
+        <PrivateRoute path="/user" component={LoggedIn} roles={roles} />
       </Switch>
     </Router>
   );
 }
 
-function Navbar() {
+function Navbar(props) {
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [isAuthenticated, userHasAuthenticated] = useState(false);
+
   const logout = () => {
     facade.logout();
+    userHasAuthenticated(false);
   }
 
-  return(
+  useEffect(() => {
+    onLoad();
+  }, []);
+
+  function onLoad() {
+    userHasAuthenticated(true);
+    setIsAuthenticating(false);
+  }
+
+  return (
+    !isAuthenticating &&
     <nav className="header">
       <ul>
         <li>
@@ -47,10 +63,10 @@ function Navbar() {
         <li>
           <NavLink to="/user">Test</NavLink>
         </li>
-        
-        {facade.getToken() == null ? (<li style={{float: "right"}}>
+
+        {facade.getToken() == null ? (<li style={{ float: "right" }}>
           <Link to="/login">Log in</Link>
-        </li>) : (<li style={{float: "right"}}><Link to="/" onClick={logout}>Log out</Link></li>)
+        </li>) : (<li style={{ float: "right" }}><Link to="/" onClick={logout}>Log out</Link></li>)
         }
 
       </ul>
@@ -58,55 +74,38 @@ function Navbar() {
   );
 }
 
-const PrivateRoute = ({component: Component, roles: roles, ...rest}) => {
+const PrivateRoute = ({ component: Component, roles: roles, ...rest }) => {
   return (
     <Route
       {...rest}
       render={(props) => facade.getToken() != null
         ? <Component {...props} roles={roles} />
-        : <Redirect to={{pathname: '/login', state: {from: props.location}}} />} />
+        : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />} />
   )
 }
 
 function Home() {
-  return(
+  return (
     <div>Home</div>
   );
 }
 
-function Login(props) {
-  const [err, setErr] = useState("");
-
-  const setErrorMsg = (msg) => {
-    setErr(msg);
-  }
-
-  const login = (user, pass) => {
-    facade.login(user, pass)
-      .then(data => {props.getRoles(data.roles)})
-      .catch(err => {
-        setErrorMsg("Wrong username or password");
-      });
-  }
-
-  return (
-    <div>
-      <LogIn login={login} setErrorMsg={setErrorMsg}/>
-    </div>
-  )
-}
-
 function LogIn(props) {
+  const [err, setErr] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const login = (event) => {
     event.preventDefault();
-    props.login(username, password);
-  } 
+    facade.login(username, password)
+      .then(data => { props.logInState(data.roles) })
+      .catch(err => {
+        setErr("Wrong username or password");
+      });
+  }
 
   const onChange = (event) => {
-    props.setErrorMsg("");
+    setErr("");
     if (event.target.id === "username") {
       setUsername(event.target.value);
     } else {
@@ -115,34 +114,33 @@ function LogIn(props) {
   }
 
   return (
-
     <div className="container container-small">
-    <div className="wrapper">
-    <h2>Login</h2><br/>
-      <form className="form-signin" onSubmit={login} onChange={onChange} >
-        <div className="form form-group">
-        <input className="form-control" placeholder="User Name" id="username" />
-        </div><div className="form-group">
-        <input className="form-control" placeholder="Password" id="password" /> <br/>
-        <button className="btn btn-primary">Login</button>
-        </div>
-      </form>
+      <div className="wrapper">
+        <h2>Login</h2><br />
+        <form className="form-signin" onSubmit={login} onChange={onChange} >
+          <div className="form form-group">
+            <input className="form-control" placeholder="User Name" id="username" />
+          </div><div className="form-group">
+            <input className="form-control" placeholder="Password" id="password" /> <br />
+            <button className="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   )
 }
 
 function LoggedIn(props) {
-  const {roles} = props;
+  const { roles } = props;
   const [dataFromServer, setDataFromServer] = useState("Fetching!!");
   return (
     <div>
       <h2>Data recieved</h2>
       <h3>{dataFromServer}</h3>
       <h4>Roles</h4>
-        {
-          roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
-        }
+      {
+        roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
+      }
     </div>
   )
 }
