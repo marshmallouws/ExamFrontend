@@ -1,18 +1,20 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import facade from "./apifacade";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   NavLink,
-  Redirect
+  Redirect,
+  Link
 } from "react-router-dom";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [roles, setRoles] = useState([]);
 
-  const setLoggedIn = (state) => {
-    setIsLoggedIn(state);
+
+  const getRoles = (r) => {
+    setRoles(r);
   }
 
   return(
@@ -23,17 +25,19 @@ function App() {
           <Home/>
         </Route>
         <Route path="/login">
-          <LogIn setIsLoggedIn={setIsLoggedIn}/>
+          <Login getRoles={getRoles}/>
         </Route>
-        <PrivateRoute path="/test">
-          <Test/>
-        </PrivateRoute>
+        <PrivateRoute path="/user" component={LoggedIn} roles={roles}/>
       </Switch>
     </Router>
   );
 }
 
 function Navbar() {
+  const logout = () => {
+    facade.logout();
+  }
+
   return(
     <nav className="header">
       <ul>
@@ -41,26 +45,26 @@ function Navbar() {
           <NavLink exact to="/">Home</NavLink>
         </li>
         <li>
-          <NavLink to="/login">Login</NavLink>
+          <NavLink to="/user">Test</NavLink>
         </li>
+        
+        {facade.getToken() == null ? (<li style={{float: "right"}}>
+          <Link to="/login">Log in</Link>
+        </li>) : (<li style={{float: "right"}}><Link to="/" onClick={logout}>Log out</Link></li>)
+        }
+
       </ul>
     </nav>
   );
 }
 
-const PrivateRoute = ({component: Component, ...rest}) => {
+const PrivateRoute = ({component: Component, roles: roles, ...rest}) => {
   return (
     <Route
       {...rest}
-      render={(props) => fakeAuth.isAuthenticated === true
-        ? <Component {...props} />
+      render={(props) => facade.getToken() != null
+        ? <Component {...props} roles={roles} />
         : <Redirect to={{pathname: '/login', state: {from: props.location}}} />} />
-  )
-}
-
-function Test() {
-  return(
-    <div>Private!</div>
   )
 }
 
@@ -70,16 +74,8 @@ function Home() {
   );
 }
 
-/*
 function Login(props) {
-  //const [loggedIn, setLoggedIn] = useState(false);
-  const [roles, setRoles] = useState([]);
   const [err, setErr] = useState("");
-
-  const logout = () => {
-    facade.logout();
-    setLoggedIn(false);
-  }
 
   const setErrorMsg = (msg) => {
     setErr(msg);
@@ -87,45 +83,30 @@ function Login(props) {
 
   const login = (user, pass) => {
     facade.login(user, pass)
-      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
+      .then(data => {props.getRoles(data.roles)})
       .catch(err => {
         setErrorMsg("Wrong username or password");
       });
   }
 
   return (
-    <div> 
-      {!loggedIn ? (<div><LogIn login={login} setErrorMsg={setErrorMsg} /><p>{err}</p></div>) :
-        (<div>
-          <LoggedIn roles={roles} />
-          <button onClick={logout}>Logout</button>
-        </div>)}
+    <div>
+      <LogIn login={login} setErrorMsg={setErrorMsg}/>
     </div>
   )
-}  */
+}
 
 function LogIn(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-  const [roles, setRoles] = useState([]);
-  /*
+
   const login = (event) => {
     event.preventDefault();
     props.login(username, password);
-  } */
-
-  const login = (event) => {
-    event.preventDefault();
-    facade.login(username, password)
-      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
-      .catch(err => {
-        setErr("Wrong username or password");
-    });
-  }
+  } 
 
   const onChange = (event) => {
-    setErr("");
+    props.setErrorMsg("");
     if (event.target.id === "username") {
       setUsername(event.target.value);
     } else {
