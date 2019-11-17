@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import facade from "./apifacade";
 import Navbar from "./Navbar";
 import Login from "./Login";
@@ -7,16 +7,16 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  NavLink,
   Redirect,
-  Link
 } from "react-router-dom";
 
 function App() {
   const [roles, setRoles] = useState([]);
+  const [username, setUsername] = useState("");
 
-  const logInState = (r) => {
+  const logInState = (r, u) => {
     setRoles(r);
+    setUsername(u);
   }
 
   return (
@@ -29,34 +29,50 @@ function App() {
         <Route path="/login">
           <Login logInState={logInState} />
         </Route>
-        <PrivateRoute path="/user" component={LoggedIn} roles={roles} />
+        <PrivateRoute path="/user" component={LoggedIn} roles={roles} username={username} />
       </Switch>
     </Router>
   );
 }
 
-const PrivateRoute = ({ component: Component, roles: roles, ...rest }) => {
+function PrivateRoute({component: Component, roles, username, ...rest}) {
   return (
-    <Route
+    <Route 
       {...rest}
       render={(props) => facade.getToken() != null
-        ? <Component {...props} roles={roles} />
-        : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />} />
+        ? <Component {...props} roles={roles} username={username} />
+        : <Redirect to={{pathname: "/login", state: { from: props.location}}} />
+      }
+      />
   )
 }
 
 function Home() {
   return (
-    <div className="data-wrapper centered-text"><h1>Homepage</h1></div>
+    <div>
+    <div className="data-wrapper centered-text">
+      <h1>Quick start project</h1>
+      <p>Quickstart project includes login-functionality and protected routes</p>
+    </div>
+
+      <ul className="data-wrapper info-box">
+        <li> - Install JavaScript editor</li>
+        <li> - Clone project from https://github.com/marshmallouws/CA3Frontend.git</li>
+        <li> - In root folder of cloned project, <b>type npm install</b> to install dependencies</li>
+        <li> - Open project in VS Code</li>
+        <li> - Type <b>npm start</b> to run the project</li>
+      </ul>
+      </div>
+    
   );
 }
 
 function LoggedIn(props) {
-  const { roles } = props;
+  const { roles, username } = props;
   return (
     <div className="data-wrapper">
       <div className="info-box">
-        <h2 className="headline">Data recieved</h2>
+        <h2 className="headline">Logged in as {username}</h2>
         <h4>Roles:</h4>
         {
           roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))

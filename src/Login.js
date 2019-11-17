@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import facade from "./apifacade";
 import {
     Redirect,
@@ -13,7 +13,7 @@ function Login(props) {
     const login = (event) => {
       event.preventDefault();
       facade.login(username, password)
-        .then(data => { props.logInState(data.roles); setRedirect(true) })
+        .then(data => {props.logInState(data.roles, username); setRedirect(true) })
         .catch(err => {
           setErr("Wrong username or password");
         });
@@ -34,13 +34,13 @@ function Login(props) {
   
     return (
       <div className="container container-small">
-        <div className="wrapper">
+        <div className="data-wrapper">
           <h2>Login</h2><br />
           <form className="form-signin" onSubmit={login} onChange={onChange} >
             <div className="form form-group">
               <input className="form-control" placeholder="User Name" id="username" />
             </div><div className="form-group">
-              <input className="form-control" placeholder="Password" id="password" /> <br />
+              <input className="form-control" type="password" placeholder="Password" id="password" /> <br />
               <button className="btn btn-primary">Login</button>
             </div>
           </form>

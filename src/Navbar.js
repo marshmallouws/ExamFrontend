@@ -31,7 +31,7 @@ function Navbar(props) {
             <NavLink exact to="/">Home</NavLink>
           </li>
           <li>
-            <NavLink to="/user">Test</NavLink>
+            <NavLink to="/user">Roles</NavLink>
           </li>
   
           {facade.getToken() == null ? (<li style={{ float: "right" }}>
