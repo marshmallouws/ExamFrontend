@@ -6,6 +6,10 @@
   height: 40vmin;
 }
 
+body {
+  background-color: #a9a9a9;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -19,4 +23,32 @@
 
 .App-link {
   color: #09d3ac;
+}
+
+.data-wrapper {
+  width: 400px;
+  margin: auto;
+  margin-top: 50px;
+}
+
+.data-wrapper h1 {
+  color: white;
+}
+
+.centered-text {
+  text-align: center;
+}
+
+.info-box {
+  padding: 10pt;
+  background-color: #fff;
+  border-radius: 10pt;
+  -webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, .75);
+  -moz-box-shadow: 0px 5px 5px rgba(0, 0, 0, .75);
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, .75);
+}
+
+h2.headline {
+  padding-bottom: 10px;
+  border-bottom: 1px solid;
 }

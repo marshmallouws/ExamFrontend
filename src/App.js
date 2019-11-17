@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import facade from "./apifacade";
 import Navbar from "./Navbar";
 import Login from "./Login";
+import './App.css';
 import {
   BrowserRouter as Router,
   Switch,
@@ -20,7 +21,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar/>
+      <Navbar />
       <Switch>
         <Route exact path="/">
           <Home />
@@ -46,21 +47,21 @@ const PrivateRoute = ({ component: Component, roles: roles, ...rest }) => {
 
 function Home() {
   return (
-    <div>Home</div>
+    <div className="data-wrapper centered-text"><h1>Homepage</h1></div>
   );
 }
 
 function LoggedIn(props) {
   const { roles } = props;
-  const [dataFromServer, setDataFromServer] = useState("Fetching!!");
   return (
-    <div>
-      <h2>Data recieved</h2>
-      <h3>{dataFromServer}</h3>
-      <h4>Roles</h4>
-      {
-        roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
-      }
+    <div className="data-wrapper">
+      <div className="info-box">
+        <h2 className="headline">Data recieved</h2>
+        <h4>Roles:</h4>
+        {
+          roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
+        }
+      </div>
     </div>
   )
 }
