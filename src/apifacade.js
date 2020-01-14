@@ -1,7 +1,7 @@
-const URL = "http://localhost:8080/securitystarter";
+const URL = "http://localhost:8080/exam/";
 function handleHttpErrors(res) {
     if (!res.ok) {
-        return Promise.reject({ status: res.status, fullError: res.json() })
+        return Promise.reject({ status: res.status, fullError: res.json()})
     }
     return res.json();
 }
@@ -48,6 +48,12 @@ class ApiFacade {
             opts.body = JSON.stringify(body);
         }
         return opts;
+    }
+
+    simpleMovie = (title) => {
+        const promise = fetch(URL + "api/movies/movie-info-simple/" + title)
+            .then(handleHttpErrors);
+        return promise;
     }
 }
 

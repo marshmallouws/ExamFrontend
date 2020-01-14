@@ -7,7 +7,7 @@
 }
 
 body {
-  background-color: #a9a9a9;
+  background-color: #fffafa;
 }
 
 .App-header {
@@ -26,13 +26,13 @@ body {
 }
 
 .data-wrapper {
-  width: 400px;
+  width: 60%;
   margin: auto;
   margin-top: 50px;
 }
 
 .data-wrapper h1 {
-  color: white;
+  color: rgb(88, 24, 24);
 }
 
 .centered-text {

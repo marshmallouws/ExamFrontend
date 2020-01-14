@@ -2,6 +2,8 @@ import React, { useState } from "react"
 import facade from "./apifacade";
 import Navbar from "./Navbar";
 import Login from "./Login";
+import Home from "./Home";
+import ShowMovie from "./ShowMovie";
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -13,6 +15,7 @@ import {
 function App() {
   const [roles, setRoles] = useState([]);
   const [username, setUsername] = useState("");
+  const [movie, setMovie] = useState({});
 
   const logInState = (r, u) => {
     setRoles(r);
@@ -24,10 +27,13 @@ function App() {
       <Navbar />
       <Switch>
         <Route exact path="/">
-          <Home />
+          <Home setMovie={setMovie}/>
         </Route>
         <Route path="/login">
           <Login logInState={logInState} />
+        </Route>
+        <Route path="/movie/:title">
+          <ShowMovie movie={movie} />
         </Route>
         <PrivateRoute path="/user" component={LoggedIn} roles={roles} username={username} />
       </Switch>
@@ -45,26 +51,6 @@ function PrivateRoute({component: Component, roles, username, ...rest}) {
       }
       />
   )
-}
-
-function Home() {
-  return (
-    <div>
-    <div className="data-wrapper centered-text">
-      <h1>Quick start project</h1>
-      <p>Quickstart project includes login-functionality and protected routes</p>
-    </div>
-
-      <ul className="data-wrapper info-box">
-        <li> - Install JavaScript editor</li>
-        <li> - Clone project from https://github.com/marshmallouws/CA3Frontend.git</li>
-        <li> - In root folder of cloned project, <b>type npm install</b> to install dependencies</li>
-        <li> - Open project in VS Code</li>
-        <li> - Type <b>npm start</b> to run the project</li>
-      </ul>
-      </div>
-    
-  );
 }
 
 function LoggedIn(props) {
