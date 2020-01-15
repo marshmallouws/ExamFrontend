@@ -4,6 +4,8 @@ import Navbar from "./Navbar";
 import Login from "./Login";
 import Home from "./Home";
 import ShowMovie from "./ShowMovie";
+import ShowMovieCritics from "./ShowMovieCritics"
+
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -36,17 +38,18 @@ function App() {
           <ShowMovie movie={movie} />
         </Route>
         <PrivateRoute path="/user" component={LoggedIn} roles={roles} username={username} />
+        <PrivateRoute path="/movieCritic/:title" component={ShowMovieCritics} roles={roles} username={username} movie={movie} />
       </Switch>
     </Router>
   );
 }
 
-function PrivateRoute({component: Component, roles, username, ...rest}) {
+function PrivateRoute({component: Component, roles, username, movie, ...rest}) {
   return (
     <Route 
       {...rest}
       render={(props) => facade.getToken() != null
-        ? <Component {...props} roles={roles} username={username} />
+        ? <Component {...props} roles={roles} username={username} movie={movie} />
         : <Redirect to={{pathname: "/login", state: { from: props.location}}} />
       }
       />

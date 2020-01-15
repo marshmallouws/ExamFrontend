@@ -26,7 +26,7 @@ class ApiFacade {
 
     login = (user, pass) => {
         const options = this.makeOptions("POST", true, {username: user, password: pass});
-        const promise = fetch(URL + "/api/login", options) 
+        const promise = fetch(URL + "api/login", options) 
             .then(handleHttpErrors);
         
         promise.then(res => this.setToken(res.token));
@@ -52,6 +52,13 @@ class ApiFacade {
 
     simpleMovie = (title) => {
         const promise = fetch(URL + "api/movies/movie-info-simple/" + title)
+            .then(handleHttpErrors);
+        return promise;
+    }
+
+    movieAll = (title) => {
+        const options = this.makeOptions("GET", true);
+        const promise = fetch(URL + "api/movies/movie-info-all/" + title, options)
             .then(handleHttpErrors);
         return promise;
     }

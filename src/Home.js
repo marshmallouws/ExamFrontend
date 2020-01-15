@@ -2,31 +2,42 @@ import React, { useState, useEffect } from "react"
 import facade from "./apifacade";
 import {
     Redirect,
-  } from "react-router-dom";
+} from "react-router-dom";
 
 
 
 function Home(props) {
-    const[title, setTitle] = useState("");
-    const[redirect, setRedirect] = useState(false);
-    const[error, setError] = useState("");
-    
+    const [title, setTitle] = useState("");
+    const [redirect, setRedirect] = useState("");
+    const [error, setError] = useState("");
+
     const onChange = (event) => {
         setTitle(event.target.value);
     }
 
     const onClick = (evt) => {
         evt.preventDefault();
-        facade.simpleMovie(title)
-            .then(data => {props.setMovie(data); setRedirect(true); console.log(data)})
-            .catch(err => {
-                console.log(err.info);
-                setError(err);
-            });
+        if (facade.getToken() != null) {
+            facade.movieAll(title)
+                .then(data => { props.setMovie(data); setRedirect("all"); console.log(data) })
+                .catch(err => {
+                    console.log(err.info);
+                    setError(err);
+                });
+        } else {
+            facade.simpleMovie(title)
+                .then(data => { props.setMovie(data); setRedirect("simple")})
+                .catch(err => {
+                    console.log(err.info);
+                    setError(err);
+                });
+        }
     }
 
-    if(redirect) {
-        return <Redirect to={{pathname: `/movie/${title}`}} />
+    if (redirect === "simple") {
+        return <Redirect to={{ pathname: `/movie/${title}` }} />
+    } else if (redirect === "all") {
+        return <Redirect to={{ pathname: `/movieCritic/${title}`}}/>
     }
 
     return (
